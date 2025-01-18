@@ -12,11 +12,14 @@ def mean_pooling(model_output, attention_mask):
 
 class Embedding:
     def __init__(self):
-        self.model = Model.load_model()
+        self.model = Model.load_model(True)
         self.tokenizer = Model.load_tokenizer()
 
     def get_embedding(self, sentences):
-        encoded_input = self.tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
+        # encoded_input = self.tokenizer(sentences, padding=True, truncation=True, return_tensors='pt')
+        # encoded_input = self.tokenizer(sentences, padding=True, truncation=True, return_tensors='pt', max_length=512)
+
+        encoded_input = self.model.encode(sentences, convert_to_tensor=True)
 
         with torch.no_grad():
             model_output = self.model(**encoded_input)
