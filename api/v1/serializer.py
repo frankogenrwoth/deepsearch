@@ -20,4 +20,5 @@ class SearchResultsSerializer(serializers.Serializer):
     match_id = serializers.IntegerField()
     data = serializers.CharField()
     key = serializers.CharField()
+    score = serializers.FloatField()
     date_added = serializers.DateTimeField()
