@@ -14,7 +14,7 @@ class Project(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 
-    collaborators = models.ManyToManyField(UserModel, related_name='projects')
+    collaborators = models.ManyToManyField(UserModel, related_name='collaborators', through='Collaboration')
 
     def __str__(self):
         return self.name
