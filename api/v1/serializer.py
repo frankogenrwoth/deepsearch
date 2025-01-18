@@ -16,7 +16,7 @@ class ProjectSerializer(serializers.ModelSerializer):
         exclude = ('embedding',)
 
 
-class SearchResultsSerializer(serializers.Serializer):
+class SearchSerializer(serializers.Serializer):
     match_id = serializers.IntegerField()
     data = serializers.CharField()
     key = serializers.CharField()
