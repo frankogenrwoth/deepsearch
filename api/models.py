@@ -9,6 +9,7 @@ UserModel = get_user_model()
 class Project(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    embedding = models.JSONField(default=dict)
 
     is_active = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True)
