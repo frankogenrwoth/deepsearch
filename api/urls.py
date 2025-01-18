@@ -1,8 +1,12 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
 from api.v1.views import SearchView, DataView
 
+router = DefaultRouter()
+router.register(r'search', SearchView, basename='search')
+router.register(r'data', DataView, basename='data')
+
 urlpatterns = [
-    path('search/', SearchView.as_view(), name='search'),
-    path('data/', DataView.as_view(), name='data'),
+    path('v1/', include(router.urls)),
 ]
