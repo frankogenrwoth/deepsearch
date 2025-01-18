@@ -1,12 +1,12 @@
-from rest_framework import ApiView
+from rest_framework.views import APIView
 
 
-class DataView(ApiView):
+class DataView(APIView):
     def post(self, request):
         pass
 
 
-class SearchView(ApiView):
+class SearchView(APIView):
     def post(self, request):
         pass
 
