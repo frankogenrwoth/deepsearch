@@ -6,38 +6,39 @@ import torch
 import re
 
 class SemanticScore:
-    def __init__(self, embeddings = None):
-        self.embeddings = embeddings
-        self.model = Model.load_model(with_sentence_transformer=True)
-        self.tokenizer = Model.load_tokenizer()
+    def __init__(self, data, corpus_embeddings = None):
+        self.corpus_embeddings = corpus_embeddings
+        self.embedder = Model.load_embedder()
+        self.data = data
 
-    def get_semantic_score(self, query_text: list):
-        # Encode the query text
-        encoded_query = self.model.encode(query_text, convert_to_tensor=True)
-        # print(encoded_query)
+    def get_semantic_score(self, size, queries: list):
+        top_k = min(size, len(queries))
 
-        # find similar matches using cosine similarity
-        cos_scores = util.cos_sim(encoded_query, self.embeddings)
+        data = []
 
-        # sim = self.model.similarity(encoded_query, self.embeddings)
+        for query in queries:
+            query_embedding = Embedding(corpus=query).embed()
 
-        # print(sim)
+            similarity_scores = self.embedder.similarity(query_embedding, self.corpus_embeddings)[0]
+            scores, indices = self.get_top_k_indices(similarity_scores, k=top_k)
 
-        return cos_scores
+            data.append((query, scores, indices))
+
+        return data
 
 
-    def get_top_k_indices(self, cos_scores, k):
-        top_results = torch.topk(cos_scores, k=k, dim=-1)
-        indices = top_results.indices.tolist()
+    def get_top_k_indices(self, similarity_scores, k):
+        scores, indices = torch.topk(similarity_scores, k=k)
 
-        return indices
+        return scores, indices
 
-    def display_results(self, query_text, passages, indices):
-        for i, result in enumerate(indices):
-            print(f"Query: {query_text[i]}")
-            for idx in result:
-                print(f"Passage: {passages[idx]}")
-            print()
+    def display_results(self, result):
+        print("query: ", result[0])
+        print()
+        print("RESULTS:\n\n")
+
+        for score, idx in zip(result[1], result[2]):
+            print(self.data[idx], f"(Score: {score:.4f})")
 
 # example usage
 # semantic_score = SemanticScore()
@@ -59,7 +60,7 @@ if __name__ == "__main__":
     ]
 
     # generate sample embeddings
-    embeddings = Embedding().embed(sentences)
+    embeddings = Embedding(corpus=sentences).embed()
 
     print("embeddings shape: ", embeddings.shape)
 
@@ -67,7 +68,10 @@ if __name__ == "__main__":
     queries = ["what does a software engineer do", "what is a contract"]
 
     # instantiate the semantic score class
-    semantic_score = SemanticScore()
-    cos_scores = semantic_score.get_semantic_score(queries)
-    indices = semantic_score.get_top_k_indices(cos_scores, 5)
-    semantic_score.display_results(queries, sentences, indices)
+    semantic_score = SemanticScore(data=sentences, corpus_embeddings=embeddings)
+
+    outputs = semantic_score.get_semantic_score(size=5, queries=queries)
+
+    for i in outputs:
+        semantic_score.display_results(i)
+        print()
